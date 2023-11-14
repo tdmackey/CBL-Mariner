@@ -1,7 +1,7 @@
 Summary:      Default file system
 Name:         filesystem
 Version:      1.1
-Release:      17%{?dist}
+Release:      18%{?dist}
 License:      GPLv3
 Group:        System Environment/Base
 Vendor:       Microsoft Corporation
@@ -426,7 +426,7 @@ install uhci_hcd /sbin/modprobe ehci_hcd ; /sbin/modprobe -i uhci_hcd ; true
 # End /etc/modprobe.d/usb.conf
 EOF
 
-# Security patch for CCE-14118-4, msid: 6.6 
+# Security patch for CCE-14118-4, msid: 6.6
 # Disable the installation and use of file systems that are not required (squashfs)
 cat > %{buildroot}/etc/modprobe.d/squashfs.conf <<- "EOF"
 # Begin /etc/modprobe.d/squashfs.conf
@@ -436,7 +436,7 @@ install squashfs /bin/true
 # End /etc/modprobe.d/squashfs.conf
 EOF
 
-# Security patch for msid: 1.1.21.1 
+# Security patch for msid: 1.1.21.1
 # Ensure mounting of USB storage devices is disabled
 cat > %{buildroot}/etc/modprobe.d/usb-storage.conf <<- "EOF"
 # Begin /etc/modprobe.d/usb-storage.conf
@@ -446,7 +446,7 @@ install usb-storage /bin/true
 # End /etc/modprobe.d/usb-storage.conf
 EOF
 
-# Security patch for msid: 6.1 
+# Security patch for msid: 6.1
 # Disable the installation and use of file systems that are not required (cramfs)
 cat > %{buildroot}/etc/modprobe.d/cramfs.conf <<- "EOF"
 # Begin /etc/modprobe.d/cramfs.conf
@@ -456,7 +456,7 @@ install cramfs /bin/true
 # End /etc/modprobe.d/cramfs.conf
 EOF
 
-# Security patch for msid: 6.2 
+# Security patch for msid: 6.2
 # Disable the installation and use of file systems that are not required (freevxfs)
 cat > %{buildroot}/etc/modprobe.d/freevxfs.conf <<- "EOF"
 # Begin /etc/modprobe.d/freevxfs.conf
@@ -466,7 +466,7 @@ install freevxfs /bin/true
 # End /etc/modprobe.d/freevxfs.conf
 EOF
 
-# Security patch for msid: 6.3 
+# Security patch for msid: 6.3
 # Disable the installation and use of file systems that are not required (hfs)
 cat > %{buildroot}/etc/modprobe.d/hfs.conf <<- "EOF"
 # Begin /etc/modprobe.d/hfs.conf
@@ -476,7 +476,7 @@ install hfs /bin/true
 # End /etc/modprobe.d/hfs.conf
 EOF
 
-# Security patch for msid: 6.4 
+# Security patch for msid: 6.4
 # Disable the installation and use of file systems that are not required (hfsplus)
 cat > %{buildroot}/etc/modprobe.d/hfsplus.conf <<- "EOF"
 # Begin /etc/modprobe.d/hfsplus.conf
@@ -486,7 +486,7 @@ install hfsplus /bin/true
 # End /etc/modprobe.d/hfsplus.conf
 EOF
 
-# Security patch for msid: 6.5 
+# Security patch for msid: 6.5
 # Disable the installation and use of file systems that are not required (jffs2)
 cat > %{buildroot}/etc/modprobe.d/jffs2.conf <<- "EOF"
 # Begin /etc/modprobe.d/jffs2.conf
@@ -558,6 +558,12 @@ posix.mkdir("/proc")
 posix.mkdir("/sys")
 posix.chmod("/proc", 0555)
 posix.chmod("/sys", 0555)
+
+path = "/media"
+st = posix.stat(path)
+if st and st.type == "link" then
+  os.remove(path)
+end
 return 0
 
 %files
@@ -665,7 +671,7 @@ return 0
 # 	ghosted /usr/lib/debug symlinks.
 #
 #   Ghost them to allow others packages to create/provide files
-#   inside the symlinks without conflicting with this package. 
+#   inside the symlinks without conflicting with this package.
 %ghost /usr/lib/debug/lib64
 %ghost /usr/lib/debug/usr/bin
 %ghost /usr/lib/debug/usr/lib
@@ -711,6 +717,9 @@ return 0
 %config(noreplace) /etc/modprobe.d/tipc.conf
 
 %changelog
+* Tue Nov 14 2023 David Mackey <dmackey@linkedin.com> - 1.1.-18
+- Unlink /media as pretransaction step to avoid upgrade conflict when creating directory
+
 * Thu Oct 12 2023 Chris PeBenito <chpebeni@microsoft.com> - 1.1-17
 - Restore the /opt directory.
 
